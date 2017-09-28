@@ -5,9 +5,7 @@ import {check} from 'meteor/check';
 export const People = new Mongo.Collection("people");
 
 if(Meteor.isServer){
-  Meteor.publish("people", function(argument){
-    People.find();
-  });
+  Meteor.publish(null, () => People.find());
 }
 Meteor.methods({
   "people.insert":function(item){

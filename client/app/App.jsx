@@ -3,7 +3,8 @@ import {Form, Button, FormControl} from 'react-bootstrap';
 import {createContainer} from 'meteor/react-meteor-data';
 import {People} from '../../imports/api/people.js';
 import {Random} from 'meteor/random';
-import Person from './Person.jsx'
+import Person from './Person.jsx';
+import Login from './login/Login.jsx';
 
 class App extends Component{
   constructor(props){
@@ -47,12 +48,13 @@ class App extends Component{
   render(){
     return(
       <div>
+        <Login />
         <Form inline>
           <ul>
             {this.renderPeople()}
           </ul>
           <Button onClick={() => this.addPerson()}>
-            Add
+            Dodaj
           </Button>
           <Button onClick={() => this.removePeople()}>
             Remove
