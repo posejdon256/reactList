@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom';
-import {FormControl,Button} from 'react-bootstrap';
+import {Button} from 'react-bootstrap';
 import TextInput from './inputs/TextInput.jsx';
 import SelectInput from './inputs/SelectInput.jsx';
 import EmailInput from './inputs/EmailInput.jsx';
@@ -12,6 +12,7 @@ export default class Person extends Component{
     this.notEmpty = this.notEmpty.bind(this);
     this.emailValidation = this.emailValidation.bind(this);
     this.validIP = this.validIP.bind(this);
+
     this.state = {
       first_name: this.props.person.first_name,
       last_name: this.props.person.last_name,
@@ -55,14 +56,19 @@ export default class Person extends Component{
       _error = false;
     return this.updateError(_error);
   }
-  finishEdition(event){
+  isFormValid(){
     if(this.validIP('ip_address',this.state.ip_address) !== 'success'
       || this.emailValidation(this.state.email) !== 'success'
       || this.notEmpty('first_name', this.state.first_name) !== 'success'
       || this.notEmpty('last_name', this.state.last_name) !== 'success' ){
         this.setState({error: true});
-        return;
+        return false;
       }
+      return true;
+  }
+  finishEdition(event){
+    if(!this.isFormValid())
+      return;
     this.setState({error: false});
     let item = {
       _id: this.props.person._id,
