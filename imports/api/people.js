@@ -18,7 +18,8 @@ Meteor.methods({
       gender: item.gender,
       ip_address: item.ip_address,
       selected: item.selected,
-      edited: item.edited
+      edited: item.edited,
+      userId: item.userId
     });
   },
   "people.remove": function(id){

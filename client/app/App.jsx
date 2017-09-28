@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import ReactDOM from 'react-dom';
 import {Form, Button, FormControl} from 'react-bootstrap';
 import {createContainer} from 'meteor/react-meteor-data';
 import {People} from '../../imports/api/people.js';
@@ -11,6 +12,11 @@ class App extends Component{
     super(props);
   }
   checkPerson(person){
+    if(person.userId !== Meteor.userId()){
+      let _id = person._id;
+      ReactDOM.findDOMNode(this.refs[_id]).checked = false;
+      return;
+    }
     person.selected = !person.selected;
     Meteor.call("people.update", person);
   }
@@ -18,7 +24,9 @@ class App extends Component{
     return this.props.people.map((person) => {
        return (
       <ol className="list-item" key={person._id}>
-        <FormControl ref="selected" type="checkbox" value={person.selected} placeholder="Wybierz" onChange={() => this.checkPerson(person)}/>
+        <FormControl
+          ref={person._id} type="checkbox" value={person.selected}
+          placeholder="Wybierz" onChange={() => this.checkPerson(person)}/>
         <Person updatePerson={this.updatePerson} person={person} />
        </ol>);
     });
@@ -32,13 +40,14 @@ class App extends Component{
       last_name: "Kowalski",
       email: "example@example.pl",
       gender: 1,
-      ip_address: "111.111.111.111"
+      ip_address: "111.111.111.111",
+      userId: Meteor.userId()
     }
     Meteor.call("people.insert", newPerson);
   }
   removePeople(){
     this.props.people.map((person) => {
-       if(person.selected)
+       if(person.selected && person.userId === Meteor.userId())
           Meteor.call("people.remove", person._id);
     });
   }
@@ -48,7 +57,7 @@ class App extends Component{
   render(){
     return(
       <div>
-        <Login />
+        <Login updateComponent={this.reRenderApp} />
         <Form inline>
           <ul>
             {this.renderPeople()}
