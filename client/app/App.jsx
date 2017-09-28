@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import {Form, Button} from 'react-bootstrap';
+import {Form, Button, FormControl} from 'react-bootstrap';
 import {createContainer} from 'meteor/react-meteor-data';
 import {People} from '../../imports/api/people.js';
 import {Random} from 'meteor/random';
@@ -9,9 +9,17 @@ class App extends Component{
   constructor(props){
     super(props);
   }
+  checkPerson(person){
+    person.selected = !person.selected;
+    Meteor.call("people.update", person);
+  }
   renderPeople(){
     return this.props.people.map((person) => {
-       return (<Person updatePerson={this.updatePerson} key={person._id} person={person} />);
+       return (
+      <ol className="list-item" key={person._id}>
+        <FormControl ref="selected" type="checkbox" value={person.selected} placeholder="Wybierz" onChange={() => this.checkPerson(person)}/>
+        <Person updatePerson={this.updatePerson} person={person} />
+       </ol>);
     });
   }
   addPerson(){
@@ -21,9 +29,9 @@ class App extends Component{
       edited: true,
       first_name: "Jan",
       last_name: "Kowalski",
-      email: "",
-      gender: 0,
-      ip_address: ""
+      email: "example@example.pl",
+      gender: 1,
+      ip_address: "111.111.111.111"
     }
     Meteor.call("people.insert", newPerson);
   }
