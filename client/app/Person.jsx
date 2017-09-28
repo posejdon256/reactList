@@ -21,9 +21,13 @@ export default class Person extends Component{
       ip_address: this.props.person.ip_address,
       editedText: this.props.person.edited ? 'Zakończ edycje' : 'Edytuj',
       edited: this.props.person.edited,
-      error: true
+      hasError: false
     };
     this.handleChange = this.handleChange.bind(this);
+  }
+  componentDidCatch(error, info){
+    this.setState({hasError : true});
+    console.log(error);
   }
   handleChange(name, value){
     let stateObject = {};

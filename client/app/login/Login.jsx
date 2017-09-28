@@ -4,7 +4,11 @@ import {Template} from 'meteor/templating';
 import {Blaze} from 'meteor/blaze';
 
 export default class Login extends Component {
+  constructor(props){
+    super(props);
+  }
   componentDidMount(){
+
     this.view = Blaze.render(Template.loginButtons, ReactDOM.findDOMNode(this.refs.container));
   }
   componentWillUnmount(){

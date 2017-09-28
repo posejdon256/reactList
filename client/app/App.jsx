@@ -6,15 +6,18 @@ import {People} from '../../imports/api/people.js';
 import {Random} from 'meteor/random';
 import Person from './Person.jsx';
 import Login from './login/Login.jsx';
+import ErrorBoundary from './error/ErrorBoundry.jsx';
 
 class App extends Component{
   constructor(props){
     super(props);
+    this.reRenderApp = this.reRenderApp.bind(this);
   }
   checkPerson(person){
     if(person.userId !== Meteor.userId()){
       let _id = person._id;
       ReactDOM.findDOMNode(this.refs[_id]).checked = false;
+      this.reRenderApp();
       return;
     }
     person.selected = !person.selected;
@@ -26,6 +29,7 @@ class App extends Component{
       <ol className="list-item" key={person._id}>
         <FormControl
           ref={person._id} type="checkbox" value={person.selected}
+           {...person.userId !== Meteor.userId() ? {disabled : true} : {}}
           placeholder="Wybierz" onChange={() => this.checkPerson(person)}/>
         <Person updatePerson={this.updatePerson} person={person} />
        </ol>);
@@ -54,21 +58,26 @@ class App extends Component{
   updatePerson(person){
     Meteor.call("people.update", person);
   }
+  reRenderApp(){
+    this.forceUpdate();
+  }
   render(){
     return(
       <div>
-        <Login updateComponent={this.reRenderApp} />
-        <Form inline>
-          <ul>
-            {this.renderPeople()}
-          </ul>
-          <Button onClick={() => this.addPerson()}>
-            Dodaj
-          </Button>
-          <Button onClick={() => this.removePeople()}>
-            Remove
-          </Button>
-        </Form>
+        <ErrorBoundary>
+          <Login updateComponent={this.reRenderApp} />
+          <Form inline>
+            <ul>
+              {this.renderPeople()}
+            </ul>
+            <Button onClick={() => this.addPerson()}>
+              Dodaj
+            </Button>
+            <Button onClick={() => this.removePeople()}>
+              Remove
+            </Button>
+          </Form>
+      </ErrorBoundary>
     </div>
     );
   }
