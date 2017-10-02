@@ -12,6 +12,7 @@ export default class Person extends Component{
     this.notEmpty = this.notEmpty.bind(this);
     this.emailValidation = this.emailValidation.bind(this);
     this.validIP = this.validIP.bind(this);
+    this.finishEdition = this.finishEdition.bind(this);
 
     this.state = {
       first_name: this.props.person.first_name,
@@ -20,14 +21,9 @@ export default class Person extends Component{
       gender: this.props.person.gender,
       ip_address: this.props.person.ip_address,
       editedText: this.props.person.edited ? 'Zakończ edycje' : 'Edytuj',
-      edited: this.props.person.edited,
-      hasError: false
+      edited: this.props.person.edited
     };
     this.handleChange = this.handleChange.bind(this);
-  }
-  componentDidCatch(error, info){
-    this.setState({hasError : true});
-    console.log(error);
   }
   handleChange(name, value){
     let stateObject = {};
@@ -94,15 +90,15 @@ export default class Person extends Component{
     return(
       <div>
           <TextInput name={"first_name"} edited={this.state.edited} value={this.state.first_name}
-             description={"Imie"} updateValue={(n, v) => this.handleChange(n, v)} getValidationState={(n, v) => this.notEmpty(n, v)} />
+             description={"Imie"} updateValue={this.handleChange} getValidationState={this.notEmpty} />
           <TextInput name={"last_name"} edited={this.state.edited} value={this.state.last_name}
-             description={"Nazwisko"} updateValue={(n, v) => this.handleChange(n, v)} getValidationState={(n, v) => this.notEmpty(n, v)} />
-           <EmailInput name={"email"} edited={this.state.edited} value={this.state.email} getValidationState={(v) => this.emailValidation(v)}
-          description={"Email"} updateValue={(n, v) => this.handleChange(n, v)}/>
-         <SelectInput personId={this.props.person._id} edited={this.state.edited} value={this.state.gender} updateValue={(n, v) => this.handleChange(n, v)} />
+             description={"Nazwisko"} updateValue={this.handleChange} getValidationState={this.notEmpty} />
+           <EmailInput name={"email"} edited={this.state.edited} value={this.state.email} getValidationState={this.emailValidation}
+          description={"Email"} updateValue={this.handleChange}/>
+         <SelectInput personId={this.props.person._id} edited={this.state.edited} value={this.state.gender} updateValue={this.handleChange} />
           <TextInput name={"ip_address"} edited={this.state.edited} value={this.state.ip_address}
-             description={"Adres IP"} updateValue={(n, v) => this.handleChange(n, v)} getValidationState={(n, v) => this.validIP(n, v)} />
-           <Button onClick={(e) => this.finishEdition(e)}>{this.state.editedText}</Button>
+             description={"Adres IP"} updateValue={this.handleChange} getValidationState={this.validIP} />
+           <Button onClick={this.finishEdition}>{this.state.editedText}</Button>
       </div>
     );
   }

@@ -25,3 +25,6 @@ export default class ErrorBoundary extends Component {
     return this.props.children;
   }
 }
+export function catchError(e){
+  console.log('Error with message: ' + e.message + ' was thrown.');
+}

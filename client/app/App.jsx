@@ -8,22 +8,23 @@ import Person from './Person.jsx';
 import Login from './login/Login.jsx';
 import ErrorBoundary from './error/ErrorBoundry.jsx';
 
+function catchError(e){
+  console.log('Error with message: ' + e.message + ' was thrown.');
+}
+
 class App extends Component{
   constructor(props){
     super(props);
     this.reRenderApp = this.reRenderApp.bind(this);
   }
+
   checkPerson(person){
-    if(person.userId !== Meteor.userId()){
-      let _id = person._id;
-      ReactDOM.findDOMNode(this.refs[_id]).checked = false;
-      this.reRenderApp();
-      return;
-    }
     person.selected = !person.selected;
-    Meteor.call("people.update", person);
+    Meteor.call("people.update", person, catchError);
   }
   renderPeople(){
+    if(Meteor.userId() === null)
+      return;
     return this.props.people.map((person) => {
        return (
       <ol className="list-item" key={person._id}>
@@ -47,16 +48,16 @@ class App extends Component{
       ip_address: "111.111.111.111",
       userId: Meteor.userId()
     }
-    Meteor.call("people.insert", newPerson);
+    Meteor.call("people.insert", newPerson, catchError);
   }
   removePeople(){
     this.props.people.map((person) => {
        if(person.selected && person.userId === Meteor.userId())
-          Meteor.call("people.remove", person._id);
+          Meteor.call("people.remove", person._id, catchError);
     });
   }
   updatePerson(person){
-    Meteor.call("people.update", person);
+    Meteor.call("people.update", person, catchError);
   }
   reRenderApp(){
     this.forceUpdate();
@@ -65,16 +66,16 @@ class App extends Component{
     return(
       <div>
         <ErrorBoundary>
-          <Login updateComponent={this.reRenderApp} />
+          <Login updateList={this.reRenderApp} />
           <Form inline>
             <ul>
               {this.renderPeople()}
             </ul>
-            <Button onClick={() => this.addPerson()}>
+            <Button onClick={this.addPerson}>
               Dodaj
             </Button>
-            <Button onClick={() => this.removePeople()}>
-              Remove
+            <Button onClick={this.removePeople}>
+              Usuń
             </Button>
           </Form>
       </ErrorBoundary>
@@ -83,7 +84,7 @@ class App extends Component{
   }
 }
 export default createContainer(() => {
-  Meteor.subscribe("people");
+  Meteor.subscribe("people", catchError);
   return {
     people: People.find({}, {}).fetch()
   };

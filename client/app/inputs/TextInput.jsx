@@ -1,9 +1,11 @@
 import React, {Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import {FormGroup, FormControl} from 'react-bootstrap';
+
 export default class TextInput extends Component{
   constructor(props){
     super(props);
+    this.updateValue = this.updateValue.bind(this);
     this.state = {
       value: this.props.value,
     };
@@ -19,7 +21,7 @@ export default class TextInput extends Component{
     return(
       <FormGroup validationState={this.props.getValidationState(this.props.name, this.state.value)}>
         <FormControl {...this.props.edited === false ? {disabled : true} : {}} ref="value" type="text" value={this.state.value}
-           placeholder={this.props.description} onChange={() => this.updateValue()}/>
+           placeholder={this.props.description} onChange={this.updateValue}/>
          <FormControl.Feedback />
       </FormGroup>
     );

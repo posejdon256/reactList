@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import {FormGroup, DropdownButton, MenuItem} from 'react-bootstrap';
+
 export default class SelectInput extends Component{
   constructor(props){
     super(props);

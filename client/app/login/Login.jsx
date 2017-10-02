@@ -6,9 +6,17 @@ import {Blaze} from 'meteor/blaze';
 export default class Login extends Component {
   constructor(props){
     super(props);
+    let that = this;
+    Tracker.autorun(function(){
+      if(Meteor.userId()){
+        that.props.updateList();
+      }
+      else{
+        that.props.updateList();
+      }
+    }, this.catchError);
   }
   componentDidMount(){
-
     this.view = Blaze.render(Template.loginButtons, ReactDOM.findDOMNode(this.refs.container));
   }
   componentWillUnmount(){
@@ -17,4 +25,5 @@ export default class Login extends Component {
   render(){
     return <span ref="container"></span>;
   }
+
 }
