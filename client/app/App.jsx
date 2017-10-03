@@ -9,6 +9,7 @@ import gql from 'graphql-tag';
 import Person from './Person.jsx';
 import Login from './login/Login.jsx';
 import ErrorBoundary from './error/ErrorBoundry.jsx';
+import { compose } from 'react-apollo';
 
 function catchError(e){
   console.log('Error with message: ' + e.message + ' was thrown.');
@@ -18,6 +19,7 @@ class App extends Component{
   constructor(props){
     super(props);
     this.reRenderApp = this.reRenderApp.bind(this);
+    this.addPerson = this.addPerson.bind(this);
   }
 
   checkPerson(person){
@@ -52,7 +54,7 @@ class App extends Component{
       ip_address: "111.111.111.111",
       userId: Meteor.userId()
     }
-  //  Meteor.call("people.insert", newPerson, catchError);
+    this.props.insertPerson({variables : {input : newPerson}});
   }
   removePeople(){
     this.props.people.map((person) => {
@@ -89,11 +91,12 @@ class App extends Component{
 }
 App.propTypes = { 
      data: PropTypes.shape({ 
-         people: PropTypes.array 
-     }).isRequired 
+         people: PropTypes.array,
+     }).isRequired ,
+     someName: PropTypes.func.isRequired
  }; 
 
-const People = gql`
+const getPeople = gql`
   query PeopleForDisplay {
     people {
       _id,
@@ -108,7 +111,13 @@ const People = gql`
     }
   }
 `;
+const insertPerson = gql`
+  mutation insertPerson($input: PersonInput!){
+    insertPerson(input: $input)
+  }
+`;
 
-export default createContainer = graphql(People, {
-    options: {pollInterval: 5000}
-})(App);
+export default ComponentWithMutations = compose(
+  graphql(insertPerson, { name: 'insertPerson' }),
+  graphql(getPeople, {options: {pollInterval: 5000}})
+)(App);
