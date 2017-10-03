@@ -1,9 +1,11 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import {Form, Button, FormControl} from 'react-bootstrap';
 import {createContainer} from 'meteor/react-meteor-data';
-import {People} from '../../imports/api/people.js';
 import {Random} from 'meteor/random';
+import { graphql } from 'react-apollo'; 
+import gql from 'graphql-tag'; 
 import Person from './Person.jsx';
 import Login from './login/Login.jsx';
 import ErrorBoundary from './error/ErrorBoundry.jsx';
@@ -20,21 +22,23 @@ class App extends Component{
 
   checkPerson(person){
     person.selected = !person.selected;
-    Meteor.call("people.update", person, catchError);
+   // Meteor.call("people.update", person, catchError);
   }
   renderPeople(){
     if(Meteor.userId() === null)
       return;
-    return this.props.people.map((person) => {
-       return (
-      <ol className="list-item" key={person._id}>
-        <FormControl
-          ref={person._id} type="checkbox" value={person.selected}
-           {...person.userId !== Meteor.userId() ? {disabled : true} : {}}
-          placeholder="Wybierz" onChange={() => this.checkPerson(person)}/>
-        <Person updatePerson={this.updatePerson} person={person} />
-       </ol>);
-    });
+    if (this.props.data.people && this.props.data.people instanceof Array) {
+      return this.props.data.people.map((person) => {
+        return (
+        <ol className="list-item" key={person._id}>
+          <FormControl
+            ref={person._id} type="checkbox" value={person.selected}
+            {...person.userId !== Meteor.userId() ? {disabled : true} : {}}
+            placeholder="Wybierz" onChange={() => this.checkPerson(person)}/>
+          <Person updatePerson={this.updatePerson} person={person} />
+        </ol>);
+      });
+    }
   }
   addPerson(){
     let newPerson = {
@@ -48,16 +52,16 @@ class App extends Component{
       ip_address: "111.111.111.111",
       userId: Meteor.userId()
     }
-    Meteor.call("people.insert", newPerson, catchError);
+  //  Meteor.call("people.insert", newPerson, catchError);
   }
   removePeople(){
     this.props.people.map((person) => {
-       if(person.selected && person.userId === Meteor.userId())
-          Meteor.call("people.remove", person._id, catchError);
+     //  if(person.selected && person.userId === Meteor.userId())
+        //  Meteor.call("people.remove", person._id, catchError);
     });
   }
   updatePerson(person){
-    Meteor.call("people.update", person, catchError);
+ //   Meteor.call("people.update", person, catchError);
   }
   reRenderApp(){
     this.forceUpdate();
@@ -83,9 +87,28 @@ class App extends Component{
     );
   }
 }
-export default createContainer(() => {
-  Meteor.subscribe("people", catchError);
-  return {
-    people: People.find({}, {}).fetch()
-  };
-}, App);
+App.propTypes = { 
+     data: PropTypes.shape({ 
+         people: PropTypes.array 
+     }).isRequired 
+ }; 
+
+const People = gql`
+  query PeopleForDisplay {
+    people {
+      _id,
+      first_name,
+      last_name,
+      email,
+      gender,
+      ip_address,
+      selected,
+      edited,
+      userId
+    }
+  }
+`;
+
+export default createContainer = graphql(People, {
+    options: {pollInterval: 5000}
+})(App);
