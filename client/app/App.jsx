@@ -20,11 +20,24 @@ class App extends Component{
     super(props);
     this.reRenderApp = this.reRenderApp.bind(this);
     this.addPerson = this.addPerson.bind(this);
+    this.updatePerson = this.updatePerson.bind(this);
+    this.removePeople = this.removePeople.bind(this);
+
   }
 
   checkPerson(person){
-    person.selected = !person.selected;
-   // Meteor.call("people.update", person, catchError);
+    let newPerson = {
+      _id: person._id,
+      selected: !person.selected,
+      edited: person.edited,
+      first_name: person.first_name,
+      last_name: person.last_name,
+      email: person.email,
+      gender: person.gender,
+      ip_address: person.ip_address,
+      userId: person.userId
+    }
+    this.props.updatePerson({variables : {input : newPerson}});
   }
   renderPeople(){
     if(Meteor.userId() === null)
@@ -57,13 +70,13 @@ class App extends Component{
     this.props.insertPerson({variables : {input : newPerson}});
   }
   removePeople(){
-    this.props.people.map((person) => {
-     //  if(person.selected && person.userId === Meteor.userId())
-        //  Meteor.call("people.remove", person._id, catchError);
+    this.props.data.people.map((person) => {
+      if(person.selected && person.userId === Meteor.userId())
+        this.props.removePerson({variables : {id : person._id}});
     });
   }
   updatePerson(person){
- //   Meteor.call("people.update", person, catchError);
+    this.props.updatePerson({variables : {input : person}});
   }
   reRenderApp(){
     this.forceUpdate();
@@ -93,7 +106,7 @@ App.propTypes = {
      data: PropTypes.shape({ 
          people: PropTypes.array,
      }).isRequired ,
-     someName: PropTypes.func.isRequired
+     insertPerson: PropTypes.func.isRequired
  }; 
 
 const getPeople = gql`
@@ -116,8 +129,20 @@ const insertPerson = gql`
     insertPerson(input: $input)
   }
 `;
+const updatePerson = gql`
+  mutation updatePerson($input: PersonInput!){
+    updatePerson(input: $input)
+  }
+`;
+const removePerson = gql`
+  mutation removePerson($id: String!){
+    removePerson(id: $id)
+  }
+`;
 
 export default ComponentWithMutations = compose(
   graphql(insertPerson, { name: 'insertPerson' }),
-  graphql(getPeople, {options: {pollInterval: 5000}})
+  graphql(updatePerson, { name: 'updatePerson' }),
+  graphql(removePerson, { name: 'removePerson' }),
+  graphql(getPeople, {options: {pollInterval: 50}})
 )(App);

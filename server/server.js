@@ -27,11 +27,27 @@ const resolvers = {
                 selected: args.input.selected,
                 edited: args.input.edited,
                 userId: args.input.userId
-              });
-              return "";
+                });
+            return "";
         },
         insertTest: (root, args) => {
             return args.message;
+        },
+        updatePerson: (root, args) => {
+            People.update(args.input._id,{$set:{
+                first_name: args.input.first_name,
+                last_name: args.input.last_name,
+                email: args.input.email,
+                gender: args.input.gender,
+                ip_address: args.input.ip_address,
+                selected: args.input.selected,
+                edited: args.input.edited
+              }});
+              return "";
+        },
+        removePerson: (root, args) => {
+            People.remove(args.id);
+            return "";
         }
     }
 }

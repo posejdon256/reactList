@@ -26,6 +26,8 @@ type Query {
   }
 type Mutation{
     insertPerson(input: PersonInput!): String,
-    insertTest(message: String!): String
+    insertTest(message: String!): String,
+    updatePerson(input: PersonInput!): String,
+    removePerson(id: String!): String
 }
 `];
